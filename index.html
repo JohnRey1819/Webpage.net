@@ -29,6 +29,8 @@
             border-radius: 15px;
             box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
             transition: transform 0.3s;
+            position: relative; /* Added position relative for absolute positioning of lines */
+            overflow: hidden; /* Hide any overflow */
         }
 
         .container:hover {
@@ -227,6 +229,48 @@
         .facebook-info li {
             margin-bottom: 5px;
         }
+
+        /* Beat Animation */
+        .beat-animation-container {
+            display: flex;
+            justify-content: center; /* Center beats */
+            margin-top: 20px;
+        }
+
+        .beat {
+            display: inline-block; /* display inline for horizontal alignment */
+            width: 10px; /* Width of each line */
+            height: 50px; /* Default height */
+            margin: 0 2px; /* Spacing between lines */
+            background: linear-gradient(to top, red, orange); /* Gradient background color */
+            animation: pulse 0.5s ease-in-out infinite; /* Define pulsing animation */
+            opacity: 0.7; /* Low opacity initially */
+        }
+
+        /* Animation Keyframes */
+        @keyframes pulse {
+            0%, 100% {
+                transform: scaleY(1); /* Original size */
+                opacity: 0.7; /* Low opacity */
+            }
+            50% {
+                transform: scaleY(1.5); /* Scale up */
+                opacity: 1; /* Full opacity at peak */
+            }
+        }
+
+        /* Create a staggered effect with different animation delays */
+        .beat:nth-child(1) { animation-delay: 0s; }
+        .beat:nth-child(2) { animation-delay: 0.05s; } /* Shorter delay for more beats */
+        .beat:nth-child(3) { animation-delay: 0.1s; }
+        .beat:nth-child(4) { animation-delay: 0.15s; }
+        .beat:nth-child(5) { animation-delay: 0.2s; }
+        .beat:nth-child(6) { animation-delay: 0.25s; }
+        .beat:nth-child(7) { animation-delay: 0.3s; }
+        .beat:nth-child(8) { animation-delay: 0.35s; }
+        .beat:nth-child(9) { animation-delay: 0.4s; }
+        .beat:nth-child(10) { animation-delay: 0.45s; }
+
     </style>
 </head>
 
@@ -249,7 +293,7 @@
                 <i class="fas fa-search" id="search-icon"></i>
                 <select id="trackSelect">
                     <option value="">SELECT MUSIC</option>
-                    <option value="yungkai.mp3">BLUE BY YUNG KAI</option>
+                    <option value="yungkai.mp3">Blue by Yung kai</option>
                     <option value="Tibok.mp3">Tibok by Earl Agustin</option>
                     <option value="Oksihina.mp3">Dionela - Oksihina</option>
                     <option value="track6.mp3">SOON</option>
@@ -266,6 +310,20 @@
                 <button id="stopButton">Stop</button>
             </div>
             <p id="no-music-message">Music is not available.</p>
+
+            <!-- Beat Animation Lines -->
+            <div class="beat-animation-container" id="beatAnimation">
+                <div class="beat"></div>
+                <div class="beat"></div>
+                <div class="beat"></div>
+                <div class="beat"></div>
+                <div class="beat"></div>
+                <div class="beat"></div>
+                <div class="beat"></div>
+                <div class="beat"></div>
+                <div class="beat"></div>
+                <div class="beat"></div>
+            </div>
         </div>
 
         <div class="about-section" id="aboutSection">
@@ -277,7 +335,7 @@
             <h2>Contact Me</h2>
             <p>I'd love to hear from you! Contact me via the links provided.</p>
             <ul>
-                <li><a href="mailto:johnreyturalde@gmail.com" target="_blank">Gmail</a></li>
+                <li><a href="johnreyturalde@gmail.com" target="_blank">Gmail</a></li>
                 <li><a href="https://www.facebook.com/turalde.johnrrey" target="_blank">Facebook</a></li>
             </ul>
             <div class="facebook-info">
@@ -311,6 +369,8 @@
         const nowPlaying = document.getElementById('nowPlaying');
         const searchInput = document.getElementById('search-input');
         const noMusicMessage = document.getElementById('no-music-message');
+        const beats = document.querySelectorAll('.beat');
+        const beatAnimationContainer = document.getElementById('beatAnimation');
 
         trackSelect.addEventListener('change', function () {
             audioSource.src = trackSelect.value;
@@ -323,11 +383,28 @@
             });
         });
 
-        playButton.addEventListener('click', () => audioPlayer.play());
-        pauseButton.addEventListener('click', () => audioPlayer.pause());
+        playButton.addEventListener('click', () => {
+            audioPlayer.play();
+            beatAnimationContainer.style.visibility = 'visible'; // Show beats
+            beats.forEach(beat => {
+                beat.style.animationPlayState = 'running'; // Start animation
+            });
+        });
+
+        pauseButton.addEventListener('click', () => {
+            audioPlayer.pause();
+            beats.forEach(beat => {
+                beat.style.animationPlayState = 'paused'; // Pause animation
+            });
+        });
+
         stopButton.addEventListener('click', () => {
             audioPlayer.pause();
             audioPlayer.currentTime = 0;
+            beats.forEach(beat => {
+                beat.style.animationPlayState = 'paused'; // Pause animation
+            });
+            beatAnimationContainer.style.visibility = 'hidden'; // Hide beats
         });
 
         aboutButton.addEventListener('click', () => {
@@ -354,6 +431,10 @@
                 option.style.display = option.text.toLowerCase().includes(searchTerm) ? 'block' : 'none';
             });
         });
+
+        // Hide beat animation initially if no song is playing
+        beatAnimationContainer.style.visibility = 'hidden';
+
     </script>
 </body>
 
