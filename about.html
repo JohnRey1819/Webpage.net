@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Music Player</title>
+    <style>
+        /* General Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: #17202a;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        h1 {
+            margin-bottom: 15px;
+            font-size: 2.5rem;
+            color: #333;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        nav ul li {
+            margin-right: 30px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #6a11cb;
+            font-weight: 600;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        nav ul li a:hover {
+            color: #2575fc;
+        }
+
+        main {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        audio {
+            width: 100%;
+            outline: none;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .controls button {
+            background-color: #6a11cb;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .controls button:hover {
+            background-color: #5a0fb1;
+            transform: translateY(-4px);
+        }
+
+        select {
+            padding: 10px;
+            border: 2px solid #6a11cb;
+            border-radius: 5px;
+            background-color: #fff;
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+
+        footer {
+            margin-top: 20px;
+            border-top: 1px solid #eaeaea;
+            padding: 10px 0;
+            text-align: center;
+        }
+
+        footer h2 {
+            margin: 10px 0;
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        footer p {
+            color: #555;
+            margin: 5px 0;
+        }
+
+        /* About Section Styling */
+        .about-section {
+            display: none; /* Initially hidden */
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(234, 236, 239, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .about-section.active {
+            display: block; /* Show when active */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Simple Music Player</h1>
+            <nav>
+                <ul>
+                    <li><a href="#" id="homeButton">Home</a></li> <!-- Home Button -->
+                    <li><a href="#" id="aboutButton">About</a></li> <!-- About Button -->
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+        </header>
+        <main>
+            <select id="trackSelect">
+                <option value="track1.mp3">Track 1 - Music Title 1</option>
+                <option value="track2.mp3">Track 2 - Music Title 2</option>
+                <option value="track3.mp3">Track 3 - Music Title 3</option>
+                <option value="track4.mp3">Track 4 - Music Title 4</option>
+            </select>
+            <audio id="audioPlayer" controls>
+                <source id="audioSource" src="track1.mp3" type="audio/mpeg">
+                Your browser does not support the audio tag.
+            </audio>
+            <div class="controls">
+                <button id="playButton">Play</button>
+                <button id="pauseButton">Pause</button>
+                <button id="stopButton">Stop</button>
+            </div>
+        </main>
+
+        <!-- About Section -->
+        <div class="about-section" id="aboutSection">
+            <h2>About This Music Player</h2>
+            <p>This simple music player allows you to select and listen to different tracks. Built with HTML, CSS, and JavaScript, it provides an elegant and responsive interface for music playback.</p>
+            <p>Feel free to explore the different tracks available and enjoy your music!</p>
+        </div>
+
+        <footer>
+            <h2>Now Playing</h2>
+            <p>Your Music Title Here</p>
+        </footer>
+    </div>
+
+    <script>
+        const trackSelect = document.getElementById('trackSelect');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const audioSource = document.getElementById('audioSource');
+        const playButton = document.getElementById('playButton');
+        const pauseButton = document.getElementById('pauseButton');
+        const stopButton = document.getElementById('stopButton');
+        const aboutSection = document.getElementById('aboutSection');
+        const aboutButton = document.getElementById('aboutButton');
+        const homeButton = document.getElementById('homeButton');
+
+        // Event Listener for Track Selection
+        trackSelect.addEventListener('change', function() {
+            audioSource.src = trackSelect.value;
+            audioPlayer.load(); // Load the new audio track
+        });
+
+        // Play the audio
+        playButton.addEventListener('click', function() {
+            audioPlayer.play();
+        });
+
+        // Pause the audio
+        pauseButton.addEventListener('click', function() {
+            audioPlayer.pause();
+        });
+
+        // Stop the audio
+        stopButton.addEventListener('click', function() {
+            audioPlayer.pause();
+            audioPlayer.currentTime = 0; // Reset to start
+        });
+
+        // Show About Section
+        aboutButton.addEventListener('click', function() {
+            aboutSection.classList.toggle('active'); // Toggle visibility
+        });
+
+        // Hide About Section when Home is clicked
+        homeButton.addEventListener('click', function() {
+            aboutSection.classList.remove('active'); // Ensure About section is hidden
+        });
+    </script>
+</body>
+</html>
