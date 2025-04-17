@@ -16,18 +16,21 @@
             font-family: 'Arial', sans-serif;
             background: linear-gradient(to right, #6a11cb, #2575fc);
             color: #17202a;
-            padding: 20px;
+            padding: 10px;
             line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
             background: rgba(255, 255, 255, 0.9);
             border-radius: 15px;
             box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
             transition: transform 0.3s;
+            margin: 10px;
+            flex: 1;
+            padding: 15px;
         }
 
         .container:hover {
@@ -36,12 +39,12 @@
 
         header {
             text-align: center;
-            padding: 20px 0;
+            padding: 10px 0;
         }
 
         h1 {
-            margin-bottom: 15px;
-            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-size: 2rem;
             color: #333;
         }
 
@@ -49,50 +52,53 @@
             list-style: none;
             padding: 0;
             display: flex;
+            flex-wrap: wrap;
             justify-content: center;
         }
 
         nav ul li {
-            margin-right: 30px;
+            margin: 5px 10px;
         }
 
         nav ul li a {
             text-decoration: none;
             color: #6a11cb;
             font-weight: 600;
-            position: relative;
+            padding: 8px 12px;
+            border-radius: 5px;
             transition: color 0.3s;
         }
 
         nav ul li a:hover {
             color: #2575fc;
+            background-color: rgba(255, 255, 255, 0.8);
         }
 
         /* Home Section */
         .home-section {
-            display: block; /* Initially visible */
+            display: block;
             text-align: center;
-            margin: 20px 0;
+            margin: 10px 0;
         }
 
         audio {
             width: 100%;
             outline: none;
             border-radius: 8px;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .controls {
             display: flex;
             justify-content: center;
-            margin-top: 10px;
+            margin-top: 5px;
         }
 
         .controls button {
             background-color: #6a11cb;
             color: white;
             border: none;
-            padding: 12px 20px;
+            padding: 8px 15px;
             margin: 5px;
             border-radius: 5px;
             cursor: pointer;
@@ -106,67 +112,56 @@
         }
 
         select {
-            padding: 10px;
+            padding: 8px;
             border: 2px solid #6a11cb;
             border-radius: 5px;
             background-color: #fff;
             font-size: 1rem;
-            margin-bottom: 15px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 10px;
         }
 
         footer {
-            margin-top: 20px;
+            margin-top: 10px;
             border-top: 1px solid #eaeaea;
-            padding: 10px 0;
+            padding: 5px 0;
             text-align: center;
         }
 
         footer h2 {
-            margin: 10px 0;
-            font-size: 1.5rem;
+            margin: 5px 0;
+            font-size: 1.2rem;
             color: #333;
         }
 
         footer p {
             color: #555;
-            margin: 5px 0;
+            margin: 2px 0;
         }
 
         /* About Section Styling */
-        .about-section {
-            display: none; /* Initially hidden */
-            margin-top: 20px;
-            padding: 20px;
+        .about-section, .contact-section {
+            display: none;
+            margin-top: 10px;
+            padding: 15px;
             background: rgba(234, 236, 239, 0.9);
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
 
-        .about-section.active {
-            display: block; /* Show when active */
-        }
-
-        /* Contact Section Styling */
-        .contact-section {
-            display: none; /* Initially hidden */
-            margin-top: 20px;
-            padding: 20px;
-            background: rgba(234, 236, 239, 0.9);
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .contact-section.active {
-            display: block; /* Show when active */
+        .about-section.active, .contact-section.active {
+            display: block;
         }
 
         .contact-section input,
         .contact-section textarea {
             width: calc(100% - 20px);
-            padding: 10px;
+            padding: 8px;
             margin: 5px 0;
             border: 2px solid #6a11cb;
             border-radius: 5px;
+            box-sizing: border-box;
         }
 
         .contact-section button {
@@ -174,7 +169,7 @@
             background-color: #6a11cb;
             color: white;
             border: none;
-            padding: 12px 20px;
+            padding: 8px 15px;
             border-radius: 5px;
             font-size: 1rem;
             cursor: pointer;
@@ -187,28 +182,56 @@
         }
 
         #search-container {
-            display: none; /* Hidden by default */
-            margin-bottom: 15px;
-        }
-
-        #search-container.active {
-            display: block; /* Show when active */
+            margin-bottom: 10px;
         }
 
         #search-input {
-            padding: 10px;
+            padding: 8px;
             border: 2px solid #6a11cb;
             border-radius: 5px;
             background-color: #fff;
             font-size: 1rem;
             width: 100%;
+            box-sizing: border-box;
         }
 
         #no-music-message {
-            display: none; /* Hidden by default */
+            display: none;
             color: red;
         }
 
+        /* Media Queries for Responsiveness */
+        @media (max-width: 480px) {
+            .container {
+                max-width: 95%;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            nav ul {
+                flex-direction: column;
+            }
+            nav ul li {
+                margin: 5px 0;
+            }
+            #search-input {
+                width: calc(100% - 20px);
+            }
+        }
+
+        .contact-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .contact-section li {
+            margin-bottom: 5px;
+        }
+
+        .contact-section a {
+            text-decoration: none;
+            color: #6a11cb;
+        }
     </style>
 </head>
 <body>
@@ -217,14 +240,13 @@
             <h1>Simple Music Player</h1>
             <nav>
                 <ul>
-                    <li><a href="#" id="homeButton">Home</a></li> 
-                    <li><a href="#" id="aboutButton">About</a></li> 
-                    <li><a href="#" id="contactButton">Contact</a></li> 
-                    <li><a href="#" id="searchButton">Search</a></li>
+                    <li><a href="#" id="homeButton">Home</a></li>
+                    <li><a href="#" id="aboutButton">About</a></li>
+                    <li><a href="#" id="contactButton">Contact</a></li>
                 </ul>
             </nav>
         </header>
-        
+
         <div class="home-section" id="homeSection">
             <div id="search-container">
                 <input type="text" id="search-input" placeholder="Search for music...">
@@ -258,12 +280,12 @@
 
         <div class="contact-section" id="contactSection">
             <h2>Contact Us</h2>
-            <form id="contactForm">
-                <input type="text" id="name" placeholder="Your Name" required>
-                <input type="email" id="email" placeholder="Your Email" required>
-                <textarea id="message" placeholder="Your Message" rows="4" required></textarea>
-                <button type="submit">Send Message</button>
-            </form>
+            <p>We'd love to hear from you! Please fill out the form below, or contact us via the links provided.</p>
+            <ul>
+                <li><a href="johnreyturalde@gmail.com" target="_blank">Gmail</a></li>
+                <li><a href="https://www.facebook.com/" target="_blank">Facebook</a></li>
+            </ul>
+           
         </div>
 
         <footer>
@@ -288,17 +310,16 @@
         const nowPlaying = document.getElementById('nowPlaying');
         const searchContainer = document.getElementById('search-container');
         const searchInput = document.getElementById('search-input');
-        const searchButton = document.getElementById('searchButton');
         const noMusicMessage = document.getElementById('no-music-message');
+        const contactForm = document.getElementById('contactForm');
 
         // Event Listener for Track Selection
         trackSelect.addEventListener('change', function() {
             audioSource.src = trackSelect.value;
             audioPlayer.load();
             nowPlaying.textContent = trackSelect.selectedOptions[0].text;
-            noMusicMessage.style.display = 'none'; //Hide message if a track is selected
+            noMusicMessage.style.display = 'none';
 
-            //Check if the music file exists
             audioPlayer.addEventListener('error', function() {
                 noMusicMessage.style.display = 'block';
             });
@@ -325,7 +346,6 @@
             aboutSection.classList.add('active');
             contactSection.classList.remove('active');
             homeSection.style.display = 'none';
-            searchContainer.classList.remove('active');
         });
 
         // Show Contact Section
@@ -333,7 +353,6 @@
             contactSection.classList.add('active');
             aboutSection.classList.remove('active');
             homeSection.style.display = 'none';
-            searchContainer.classList.remove('active');
         });
 
         // Show Home Section
@@ -341,36 +360,44 @@
             aboutSection.classList.remove('active');
             contactSection.classList.remove('active');
             homeSection.style.display = 'block';
-            searchContainer.classList.remove('active'); 
-        });
-        
-        //Show Search Section
-        searchButton.addEventListener('click', function() {
-            searchContainer.classList.add('active');
-            aboutSection.classList.remove('active');
-            contactSection.classList.remove('active');
-            homeSection.style.display = 'block';
         });
 
+
         // Handle Contact Form Submission
-        const contactForm = document.getElementById('contactForm');
         contactForm.addEventListener('submit', function(event) {
             event.preventDefault();
             const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
             const message = document.getElementById('message').value;
 
-            // Example: Simulate sending the message (you can implement actual sending logic here)
-            alert(`Message sent from ${name} (${email}): ${message}`);
-            contactForm.reset();
+            fetch('/submit-contact', { // Replace '/submit-contact' with your server endpoint
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, email, message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Message sent successfully!');
+                    contactForm.reset();
+                } else {
+                    alert('Error sending message. Please try again later.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error sending message. Please try again later.');
+            });
         });
 
-        //Search Functionality (Basic example - needs improvement for real-world use)
-        searchInput.addEventListener('input', function(){
+        //Search Functionality
+        searchInput.addEventListener('input', function() {
             const searchTerm = searchInput.value.toLowerCase();
             const options = Array.from(trackSelect.options);
             options.forEach(option => {
-                if(option.text.toLowerCase().includes(searchTerm)){
+                if (option.text.toLowerCase().includes(searchTerm)) {
                     option.style.display = 'block';
                 } else {
                     option.style.display = 'none';
