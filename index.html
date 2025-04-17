@@ -1,26 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WEB SONG</title>
     <link rel="icon" type="image/x-icon" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        /* Basic Reset and Box Sizing */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
 
+        /* Body Styles */
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Roboto', sans-serif;
             background: linear-gradient(to right, #6a11cb, #2575fc);
             color: #17202a;
             padding: 20px;
             line-height: 1.6;
         }
 
+        /* Container Styles */
         .container {
             max-width: 600px;
             margin: 0 auto;
@@ -29,30 +32,31 @@
             border-radius: 15px;
             box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
             transition: transform 0.3s;
-            position: relative; /* Added position relative for absolute positioning of lines */
-            overflow: hidden; /* Hide any overflow */
         }
 
         .container:hover {
             transform: translateY(-5px);
         }
 
+        /* Header Styles */
         header {
             text-align: center;
             padding: 20px 0;
         }
 
-        h1 {
+        header h1 {
             margin-bottom: 15px;
             font-size: 2.5rem;
             color: #333;
         }
 
+        /* Navigation Styles */
         nav ul {
             list-style: none;
             padding: 0;
             display: flex;
             justify-content: center;
+            margin-bottom: 20px;
         }
 
         nav ul li {
@@ -70,48 +74,21 @@
             color: #2575fc;
         }
 
+        /* Home Section Styles */
         .home-section {
             text-align: center;
             margin: 20px 0;
         }
 
-        audio {
-            width: 100%;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-
-        .controls {
-            display: flex;
-            justify-content: center;
-            margin-top: 10px;
-        }
-
-        .controls button {
-            background-color: #6a11cb;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            margin: 5px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
-        }
-
-        .controls button:hover {
-            background-color: #5a0fb1;
-            transform: translateY(-4px);
-        }
-
+        /* Search Container Styles */
         .search-container {
-            position: relative;
-            margin-bottom: 15px;
             display: flex;
             align-items: center;
+            margin-bottom: 20px;
             border: 2px solid #6a11cb;
             border-radius: 5px;
-            background-color: white;
             overflow: hidden;
+            position: relative; /* For positioning the icon */
         }
 
         #search-input {
@@ -133,18 +110,237 @@
             color: #6a11cb;
             font-size: 1rem;
             line-height: 40px;
+            pointer-events: none; /* Make icon non-interactive */
         }
 
-        select {
+        #trackSelect {
             padding: 10px;
             border: none;
-            border-radius: 0 5px 5px 0;
-            background-color: #fff;
+            border-left: 1px solid #6a11cb;
+            outline: none;
             font-size: 1rem;
             height: 40px;
+            color: #333;
             cursor: pointer;
         }
 
+        /* Audio Player Styles */
+        audio {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        /* Controls Styles */
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .controls button {
+            background-color: #6a11cb;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            margin: 0 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .controls button i {
+            margin-right: 5px;
+        }
+
+        .controls button:hover {
+            background-color: #5a0fb1;
+            transform: translateY(-4px);
+        }
+
+        #no-music-message {
+            color: red;
+            font-style: italic;
+            margin-top: 10px;
+        }
+
+        /* Beat Animation Styles */
+        .beat-animation-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .beat {
+            display: inline-block;
+            width: 10px;
+            height: 50px;
+            margin: 0 2px;
+            background: linear-gradient(to top, red, orange);
+            animation: pulse 0.5s ease-in-out infinite;
+            opacity: 0.7;
+        }
+
+        @keyframes pulse {
+            0%,
+            100% {
+                transform: scaleY(1);
+                opacity: 0.7;
+            }
+            50% {
+                transform: scaleY(1.5);
+                opacity: 1;
+            }
+        }
+
+        /* Staggered Beat Animation */
+        .beat:nth-child(1) { animation-delay: 0s; }
+        .beat:nth-child(2) { animation-delay: 0.05s; }
+        .beat:nth-child(3) { animation-delay: 0.1s; }
+        .beat:nth-child(4) { animation-delay: 0.15s; }
+        .beat:nth-child(5) { animation-delay: 0.2s; }
+        .beat:nth-child(6) { animation-delay: 0.25s; }
+        .beat:nth-child(7) { animation-delay: 0.3s; }
+        .beat:nth-child(8) { animation-delay: 0.35s; }
+        .beat:nth-child(9) { animation-delay: 0.4s; }
+        .beat:nth-child(10) { animation-delay: 0.45s; }
+
+        /* About Section Styles */
+        .about-section,
+        .contact-section {
+            margin-top: 20px;
+            display: none; /* Initially hidden */
+        }
+
+        .about-section h2,
+        .contact-section h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .about-section p,
+        .contact-section p {
+            margin-bottom: 15px;
+        }
+
+        .contact-section ul {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 15px;
+        }
+
+        .contact-section ul li {
+            margin-bottom: 8px;
+        }
+
+        .contact-section ul li a {
+            color: #2575fc;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .contact-section ul li a:hover {
+            text-decoration: underline;
+        }
+
+        .facebook-info {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f0f2f5;
+            border-radius: 5px;
+        }
+
+        .facebook-info h3 {
+            color: #1877f2;
+            margin-bottom: 10px;
+        }
+
+        .facebook-info ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .facebook-info ul li {
+            margin-bottom: 5px;
+            color: #65676b;
+        }
+
+        .active {
+            display: block !important;
+        }
+
+        /* Comments Section Styles */
+        .comments-section {
+            margin-top: 20px;
+            border-top: 1px solid #eaeaea;
+            padding-top: 15px;
+        }
+
+        .comments-section h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        #commentInput {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #6a11cb;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        #submitCommentButton {
+            background-color: #6a11cb;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #submitCommentButton:hover {
+            background-color: #5a0fb1;
+        }
+
+        .comments-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .comments-section li {
+            background: rgba(240, 240, 240, 0.8);
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+            position: relative;
+        }
+
+        .comments-section li span {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .comments-section li button {
+            position: absolute;
+            right: 10px;
+            top: 5px;
+            background: none;
+            border: none;
+            color: #6a11cb;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-left: 5px;
+        }
+
+        .comments-section li button:hover {
+            text-decoration: underline;
+        }
+
+        /* Footer Styles */
         footer {
             margin-top: 20px;
             border-top: 1px solid #eaeaea;
@@ -163,117 +359,24 @@
             margin: 5px 0;
         }
 
-        .about-section,
-        .contact-section {
-            display: none;
-            margin-top: 20px;
-            padding: 20px;
-            background: rgba(234, 236, 239, 0.9);
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .about-section.active,
-        .contact-section.active {
-            display: block;
-        }
-
-        .contact-section input,
-        .contact-section textarea {
-            width: calc(100% - 20px);
-            padding: 10px;
-            margin: 5px 0;
-            border: 2px solid #6a11cb;
-            border-radius: 5px;
-        }
-
-        .contact-section button {
-            margin-top: 10px;
-            background-color: #6a11cb;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 5px;
-            transition: background-color 0.3s, transform 0.2s;
-        }
-
-        .contact-section button:hover {
-            background-color: #5a0fb1;
-            transform: translateY(-4px);
-        }
-
+        /* Media Query for Smaller Screens */
         @media (max-width: 500px) {
             #search-input {
                 padding-right: 30px;
             }
-        }
 
-        .facebook-info {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: rgba(255, 255, 255, 0.8);
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .facebook-info h3 {
-            margin-bottom: 10px;
-            color: #6a11cb;
-        }
-
-        .facebook-info ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .facebook-info li {
-            margin-bottom: 5px;
-        }
-
-        /* Beat Animation */
-        .beat-animation-container {
-            display: flex;
-            justify-content: center; /* Center beats */
-            margin-top: 20px;
-        }
-
-        .beat {
-            display: inline-block; /* display inline for horizontal alignment */
-            width: 10px; /* Width of each line */
-            height: 50px; /* Default height */
-            margin: 0 2px; /* Spacing between lines */
-            background: linear-gradient(to top, red, orange); /* Gradient background color */
-            animation: pulse 0.5s ease-in-out infinite; /* Define pulsing animation */
-            opacity: 0.7; /* Low opacity initially */
-        }
-
-        /* Animation Keyframes */
-        @keyframes pulse {
-            0%, 100% {
-                transform: scaleY(1); /* Original size */
-                opacity: 0.7; /* Low opacity */
+            nav ul {
+                flex-direction: column;
+                align-items: center;
             }
-            50% {
-                transform: scaleY(1.5); /* Scale up */
-                opacity: 1; /* Full opacity at peak */
+
+            nav ul li {
+                margin: 10px 0;
+                margin-right: 0;
             }
         }
-
-        /* Create a staggered effect with different animation delays */
-        .beat:nth-child(1) { animation-delay: 0s; }
-        .beat:nth-child(2) { animation-delay: 0.05s; } /* Shorter delay for more beats */
-        .beat:nth-child(3) { animation-delay: 0.1s; }
-        .beat:nth-child(4) { animation-delay: 0.15s; }
-        .beat:nth-child(5) { animation-delay: 0.2s; }
-        .beat:nth-child(6) { animation-delay: 0.25s; }
-        .beat:nth-child(7) { animation-delay: 0.3s; }
-        .beat:nth-child(8) { animation-delay: 0.35s; }
-        .beat:nth-child(9) { animation-delay: 0.4s; }
-        .beat:nth-child(10) { animation-delay: 0.45s; }
-
     </style>
 </head>
-
 <body>
     <div class="container">
         <header>
@@ -305,13 +408,12 @@
                 Your browser does not support the audio element.
             </audio>
             <div class="controls">
-                <button id="playButton">Play</button>
-                <button id="pauseButton">Pause</button>
-                <button id="stopButton">Stop</button>
+                <button id="playButton"><i class="fas fa-play"></i>Play</button>
+                <button id="pauseButton"><i class="fas fa-pause"></i>Pause</button>
+                <button id="stopButton"><i class="fas fa-stop"></i>Stop</button>
             </div>
             <p id="no-music-message">Music is not available.</p>
 
-            <!-- Beat Animation Lines -->
             <div class="beat-animation-container" id="beatAnimation">
                 <div class="beat"></div>
                 <div class="beat"></div>
@@ -335,7 +437,7 @@
             <h2>Contact Me</h2>
             <p>I'd love to hear from you! Contact me via the links provided.</p>
             <ul>
-                <li><a href="johnreyturalde@gmail.com" target="_blank">Gmail</a></li>
+                <li><a href="mailto:johnreyturalde@gmail.com">Gmail</a></li>
                 <li><a href="https://www.facebook.com/turalde.johnrrey" target="_blank">Facebook</a></li>
             </ul>
             <div class="facebook-info">
@@ -345,6 +447,13 @@
                     <li>Course: ACT 1A</li>
                 </ul>
             </div>
+        </div>
+
+        <div class="comments-section">
+            <h2>Comments</h2>
+            <textarea id="commentInput" placeholder="Leave your comment here..." rows="4"></textarea>
+            <button id="submitCommentButton">Submit Comment</button>
+            <ul id="commentsList"></ul>
         </div>
 
         <footer>
@@ -371,6 +480,11 @@
         const noMusicMessage = document.getElementById('no-music-message');
         const beats = document.querySelectorAll('.beat');
         const beatAnimationContainer = document.getElementById('beatAnimation');
+        const commentInput = document.getElementById('commentInput');
+        const submitCommentButton = document.getElementById('submitCommentButton');
+        const commentsList = document.getElementById('commentsList');
+
+        let comments = [];
 
         trackSelect.addEventListener('change', function () {
             audioSource.src = trackSelect.value;
@@ -385,16 +499,17 @@
 
         playButton.addEventListener('click', () => {
             audioPlayer.play();
-            beatAnimationContainer.style.visibility = 'visible'; // Show beats
+            beatAnimationContainer.style.visibility = 'visible';
             beats.forEach(beat => {
-                beat.style.animationPlayState = 'running'; // Start animation
+                beat.style.animationPlayState = 'running';
             });
         });
 
         pauseButton.addEventListener('click', () => {
-            audioPlayer.pause();
+            audioPlayer.pause
+            ();
             beats.forEach(beat => {
-                beat.style.animationPlayState = 'paused'; // Pause animation
+                beat.style.animationPlayState = 'paused';
             });
         });
 
@@ -402,9 +517,9 @@
             audioPlayer.pause();
             audioPlayer.currentTime = 0;
             beats.forEach(beat => {
-                beat.style.animationPlayState = 'paused'; // Pause animation
+                beat.style.animationPlayState = 'paused';
             });
-            beatAnimationContainer.style.visibility = 'hidden'; // Hide beats
+            beatAnimationContainer.style.visibility = 'hidden';
         });
 
         aboutButton.addEventListener('click', () => {
@@ -432,10 +547,52 @@
             });
         });
 
-        // Hide beat animation initially if no song is playing
         beatAnimationContainer.style.visibility = 'hidden';
 
+        submitCommentButton.addEventListener('click', function () {
+            const commentText = commentInput.value.trim();
+            if (commentText) {
+                const comment = {
+                    id: Date.now(),
+                    text: commentText
+                };
+                comments.push(comment);
+                renderComments();
+                commentInput.value = ''; // Clear the input
+            }
+        });
+
+        function renderComments() {
+            commentsList.innerHTML = '';
+            comments.forEach(comment => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span>${comment.text}</span>
+                    <button onclick="editComment(${comment.id})"><i class="fas fa-edit"></i>Edit</button>
+                    <button onclick="deleteComment(${comment.id})"><i class="fas fa-trash-alt"></i>Delete</button>
+                `;
+                commentsList.appendChild(li);
+            });
+        }
+
+        function editComment(commentId) {
+            const comment = comments.find(c => c.id === commentId);
+            if (comment) {
+                commentInput.value = comment.text; // Populate the text area with the comment text
+                deleteComment(commentId); // Remove original comment
+            }
+        }
+
+        function deleteComment(commentId) {
+            comments = comments.filter(c => c.id !== commentId);
+            renderComments();
+        }
+
+        // Include Font Awesome for icons
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css';
+        document.head.appendChild(link);
     </script>
 </body>
-
 </html>
