@@ -14,8 +14,8 @@
 
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(to right, #4f0792, #520c27);
-            color: #17202a;
+            background: linear-gradient(to right, blue, red);
+            color: black;
             padding: 20px;
             line-height: 1.6;
         }
@@ -30,6 +30,14 @@
             transition: transform 0.3s;
             position: relative; /* Added position relative for absolute positioning of lines */
             overflow: hidden; /* Hide any overflow */
+        }
+        #title{
+            font-size: 2rem;
+            color: transparent;
+            -webkit-text-stroke: 1px red;
+            text-shadow: 1px 1px  red;
+            font-weight: 800;
+            text-transform: uppercase;
         }
 
         .container:hover {
@@ -98,7 +106,7 @@
         }
 
         .controls button:hover {
-            background-color: #545dd3;
+            background-color: #5a0fb1;
             transform: translateY(-4px);
         }
 
@@ -126,12 +134,19 @@
             color: #999;
         }
 
-      
+        #search-icon {
+            position: absolute;
+            right: 10px;
+            color: #6a11cb;
+            font-size: 1rem;
+            line-height: 40px;
+        }
+
         select {
             padding: 10px;
             border: none;
             border-radius: 0 5px 5px 0;
-            background-color: #f1f4f5;
+            background-color: #fff;
             font-size: 1rem;
             height: 40px;
             cursor: pointer;
@@ -160,7 +175,7 @@
             display: none;
             margin-top: 20px;
             padding: 20px;
-            background: rgba(244, 245, 247, 0.9);
+            background: rgba(234, 236, 239, 0.9);
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
@@ -170,8 +185,25 @@
             display: block;
         }
 
-       
-        
+        .contact-section input,
+        .contact-section textarea {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 5px 0;
+            border: 2px solid #6a11cb;
+            border-radius: 5px;
+        }
+
+        .contact-section button {
+            margin-top: 10px;
+            background-color: #6a11cb;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
         .contact-section button:hover {
             background-color: #5a0fb1;
             transform: translateY(-4px);
@@ -184,7 +216,7 @@
         }
 
         .facebook-info {
-            margin-top: 30px;
+            margin-top: 20px;
             padding: 15px;
             background-color: rgba(255, 255, 255, 0.8);
             border-radius: 10px;
@@ -214,12 +246,12 @@
 
         .beat {
             display: inline-block; /* display inline for horizontal alignment */
-            width: 5px; /* Width of each line */
-            height: 40px; /* Default height */
+            width: 8px; /* Width of each line */
+            height: 55px; /* Default height */
             margin: 0 3px; /* Spacing between lines */
-            background: linear-gradient(to top, rgb(228, 70, 228),rgb(76, 205, 209) , rgb(214, 62, 62)); /* Gradient background color */
-            animation: pulse 0.4s ease-in-out infinite; /* Define pulsing animation */
-            opacity: 10; /* Low opacity initially */
+            background: linear-gradient(to top, purple, cyan, red); /* Gradient background color */
+            animation: pulse 0.3s ease-in-out infinite; /* Define pulsing animation */
+            opacity: 0.5; /* Low opacity initially */
         }
 
         /* Animation Keyframes */
@@ -236,32 +268,22 @@
 
         /* Create a staggered effect with different animation delays */
         .beat:nth-child(1) { animation-delay: 0s; }
-        .beat:nth-child(19) { animation-delay: 0.05s; } /* Shorter delay for more beats */
-        .beat:nth-child(11) { animation-delay: 0.1s; }
-        .beat:nth-child(8) { animation-delay: 0.15s; }
+        .beat:nth-child(3) { animation-delay: 0.05s; } /* Shorter delay for more beats */
+        .beat:nth-child(5) { animation-delay: 0.1s; }
+        .beat:nth-child(7) { animation-delay: 0.15s; }
         .beat:nth-child(9) { animation-delay: 0.2s; }
         .beat:nth-child(10) { animation-delay: 0.25s; }
-        .beat:nth-child(7) { animation-delay: 0.3s; }
+        .beat:nth-child(8) { animation-delay: 0.3s; }
         .beat:nth-child(6) { animation-delay: 0.35s; }
         .beat:nth-child(4) { animation-delay: 0.4s; }
         .beat:nth-child(2) { animation-delay: 0.45s; }
-        .beat:nth-child(12) { animation-delay: 0.25s; }
-        .beat:nth-child(13) { animation-delay: 0.3s; }
-        .beat:nth-child(15) { animation-delay: 0.35s; }
-        .beat:nth-child(14) { animation-delay: 0.4s; }
-        .beat:nth-child(5) { animation-delay: 0.5s; }
-        .beat:nth-child(16) { animation-delay: 0.25s; }
-        .beat:nth-child(18) { animation-delay: 0.3s; }
-        .beat:nth-child(20) { animation-delay: 0.35s; }
-        .beat:nth-child(3) { animation-delay: 0.4s; }
-        .beat:nth-child(17) { animation-delay: 0.1s; }
 
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Simple Music Player</h1>
+            <h1 id="title">Simple Music Player</h1>
             <nav>
                 <ul>
                     <li><a href="#" id="homeButton">Home</a></li>
@@ -307,30 +329,21 @@
                 <div class="beat"></div>
                 <div class="beat"></div>
                 <div class="beat"></div>
-                <div class="beat"></div>
-                <div class="beat"></div>
-                <div class="beat"></div>
-                <div class="beat"></div>
-                <div class="beat"></div>
-                <div class="beat"></div>
-                <div class="beat"></div>
-                <div class="beat"></div>
-                <div class="beat"></div>
             </div>
         </div>
 
         <div class="about-section" id="aboutSection">
-            <h2>About This Music Player</h2><br>
+            <h2>About This Music Player</h2>
             <p>This simple music player allows you to select and listen to different tracks. Enjoy your music!</p>
         </div>
 
         <div class="contact-section" id="contactSection">
             <h2>Contact Me</h2>
             <p>I'd love to hear from you! Contact me via the links provided.</p><br>
-            <div>
-                <li><a href="mailto:johnreyturalde@gmail.com"> Gmail</a></li>
-                <li><a href="https://www.facebook.com/turalde.johnrrey" target="_blank"> Facebook</a></li>
-            </div>
+            
+                <a href="mailto:johnreyturalde@gmail.com"><img src="https://upload.wikimedia.org/wikipedia/commons/7/7e/Gmail_icon_%282020%29.svg" alt="Gmail" height="15"></a>  Gmail<br>
+                <a href="https://www.facebook.com/turalde.johnrrey" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6c/Facebook_Logo_2023.png" alt="Facebook" height="20"></a>  Facebook
+            
             <div class="facebook-info">
                 <h3>John Rey Turalde</h3>
                 <ul>
@@ -352,7 +365,7 @@
         const audioSource = document.getElementById('audioSource');
         const playButton = document.getElementById('playButton');
         const pauseButton = document.getElementById('pauseButton');
-        const nextButton = document.getElementById('nextButton'); 
+        const nextButton = document.getElementById('nextButton'); // New button
         const aboutSection = document.getElementById('aboutSection');
         const contactSection = document.getElementById('contactSection');
         const homeSection = document.getElementById('homeSection');
@@ -434,4 +447,4 @@
 
     </script>
 </body>
-</html> 
+</html>
