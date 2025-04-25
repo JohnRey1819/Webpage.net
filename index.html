@@ -240,32 +240,36 @@
         /* Beat Animation */
         .beat-animation-container {
             display: flex;
-            justify-content: center; /* Center beats */
-            margin-top: 20px;
+            justify-content: center;
+            margin-top: 30px; /* Increased margin */
+            height: 70px; /* Increased height */
+            align-items: flex-end;
+            gap: 4px; /* Gap between beats */
         }
 
         .beat {
-            display: inline-block; /* display inline for horizontal alignment */
-            width: 8px; /* Width of each line */
-            height: 55px; /* Default height */
-            margin: 0 3px; /* Spacing between lines */
-            background: linear-gradient(to top, purple, cyan, red); /* Gradient background color */
-            animation: pulse 0.3s ease-in-out infinite; /* Define pulsing animation */
-            opacity: 0.5; /* Low opacity initially */
+            display: inline-block;
+            width: 10px; /* Wider beats */
+            height: 60px; /* Taller beats */
+            background: linear-gradient(to top, #6a11cb, #2575fc, #e74c3c); /* More vibrant gradient */
+            animation: pulse 0.4s ease-in-out infinite alternate; /* Adjusted animation */
+            opacity: 0.7; /* Slightly higher initial opacity */
+            transform-origin: bottom;
+            border-radius: 2px; /* Slightly rounded ends */
         }
 
         /* Animation Keyframes */
         @keyframes pulse {
-            0%, 100% {
-                transform: scaleY(1); /* Original size */
-                opacity: 0.7; /* Low opacity */
+            0% {
+                transform: scaleY(0.5); /* Start smaller */
+                opacity: 0.5;
             }
-            50% {
-                transform: scaleY(1.5); /* Scale up */
-                opacity: 1; /* Full opacity at peak */
+            100% {
+                transform: scaleY(1.5); /* Scale up more */
+                opacity: 1;
             }
         }
-
+        
         /* Create a staggered effect with different animation delays */
         .beat:nth-child(1) { animation-delay: 0s; }
         .beat:nth-child(3) { animation-delay: 0.05s; } /* Shorter delay for more beats */
