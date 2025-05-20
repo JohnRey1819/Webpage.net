@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulated MySQL Terminal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto Mono', monospace;
+            background-color: #1a1b26; /* Dark background for the page */
+            color: #c0caf5; /* Default text color */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 1rem;
+        }
+        .terminal {
+            background-color: #24283b; /* Terminal background */
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            width: 100%;
+            max-width: 800px;
+            height: 80vh;
+            max-height: 700px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .terminal-header {
+            border-bottom: 1px solid #3b4261;
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.5rem;
+            color: #a9b1d6;
+            font-weight: bold;
+        }
+        .output-area {
+            flex-grow: 1;
+            overflow-y: auto;
+            font-size: 0.875rem; /* 14px */
+            line-height: 1.5;
+            scrollbar-width: thin;
+            scrollbar-color: #414868 #24283b;
+        }
+        .output-area::-webkit-scrollbar {
+            width: 8px;
+        }
+        .output-area::-webkit-scrollbar-track {
+            background: #24283b;
+        }
+        .output-area::-webkit-scrollbar-thumb {
+            background-color: #414868;
+            border-radius: 4px;
+        }
+        .output-line {
+            white-space: pre-wrap; /* Preserve whitespace and wrap lines */
+            word-break: break-all;
+        }
+        .prompt-line {
+            display: flex;
+            align-items: center;
+        }
+        .prompt {
+            color: #7aa2f7; /* Prompt color (e.g., mysql>) */
+            margin-right: 0.5rem;
+            font-weight: bold;
+        }
+        .input-command {
+            background-color: transparent;
+            border: none;
+            color: #c0caf5; /* Input text color */
+            flex-grow: 1;
+            outline: none;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.875rem; /* 14px */
+        }
+        .error-message {
+            color: #f7768e; /* Error message color */
+        }
+        .success-message {
+            color: #9ece6a; /* Success message color */
+        }
+        .info-message {
+            color: #7dcfff; /* Info message color */
+        }
+        .table-like {
+            border-collapse: collapse;
+            width: auto;
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+        }
+        .table-like th, .table-like td {
+            border: 1px solid #414868;
+            padding: 0.3em 0.6em;
+            text-align: left;
+        }
+        .table-like th {
+            background-color: #2c304a;
+            color: #a9b1d6;
+        }
+        .table-like td {
+            color: #c0caf5;
+        }
+        .welcome-message {
+            color: #e0af68; /* Welcome message color */
+        }
+    </style>
+</head>
+<body>
+    <div class="terminal">
+        <div class="terminal-header">
+            Simulated MySQL Terminal (Type 'HELP;' for commands)
+        </div>
+        <div class="output-area" id="outputArea">
+            </div>
+        <div class="prompt-line">
+            <span class="prompt" id="promptText">mysql&gt;</span>
+            <input type="text" class="input-command" id="commandInput" autofocus>
+        </div>
+    </div>
+
+    <script>
+        // --- DOM Elements ---
+        const commandInput = document.getElementById('commandInput');
+        const outputArea = document.getElementById('outputArea');
+        const promptText = document.getElementById('promptText');
+
+        // --- State ---
+        let currentDatabase = null; // No database selected initially
+        let commandHistory = [];
+        let historyIndex = -1;
+
+        // --- Simulated Database ---
+        const databases = {
+            information_schema: {
+                tables: {
+                    SCHEMATA: {
+                        columns: [
+                            { name: 'SCHEMA_NAME', type: 'varchar(64)' },
+                            { name: 'DEFAULT_CHARACTER_SET_NAME', type: 'varchar(32)' },
+                            { name: 'DEFAULT_COLLATION_NAME', type: 'varchar(32)' }
+                        ],
+                        data: [
+                            { SCHEMA_NAME: 'information_schema', DEFAULT_CHARACTER_SET_NAME: 'utf8mb4', DEFAULT_COLLATION_NAME: 'utf8mb4_0900_ai_ci' },
+                            { SCHEMA_NAME: 'employees_db', DEFAULT_CHARACTER_SET_NAME: 'utf8mb4', DEFAULT_COLLATION_NAME: 'utf8mb4_0900_ai_ci' },
+                            { SCHEMA_NAME: 'project_db', DEFAULT_CHARACTER_SET_NAME: 'utf8mb4', DEFAULT_COLLATION_NAME: 'utf8mb4_0900_ai_ci' },
+                            { SCHEMA_NAME: 'test_db', DEFAULT_CHARACTER_SET_NAME: 'utf8mb4', DEFAULT_COLLATION_NAME: 'utf8mb4_0900_ai_ci' }
+                        ]
+                    },
+                    TABLES: {
+                        columns: [
+                            { name: 'TABLE_SCHEMA', type: 'varchar(64)' },
+                            { name: 'TABLE_NAME', type: 'varchar(64)' },
+                            { name: 'TABLE_TYPE', type: 'varchar(64)' }
+                        ],
+                        data: [
+                            // Dynamically populated by SHOW TABLES or when a DB is USEd
+                        ]
+                    }
+                }
+            },
+            employees_db: {
+                tables: {
+                    employees: {
+                        columns: [
+                            { name: 'emp_id', type: 'INT', primaryKey: true },
+                            { name: 'first_name', type: 'VARCHAR(50)' },
+                            { name: 'last_name', type: 'VARCHAR(50)' },
+                            { name: 'hire_date', type: 'DATE' },
+                            { name: 'salary', type: 'DECIMAL(10,2)' }
+                        ],
+                        data: [
+                            { emp_id: 1, first_name: 'John', last_name: 'Doe', hire_date: '2020-01-15', salary: 60000.00 },
+                            { emp_id: 2, first_name: 'Jane', last_name: 'Smith', hire_date: '2019-03-01', salary: 75000.00 },
+                            { emp_id: 3, first_name: 'Peter', last_name: 'Jones', hire_date: '2021-07-22', salary: 55000.00 }
+                        ]
+                    },
+                    departments: {
+                        columns: [
+                            { name: 'dept_id', type: 'CHAR(4)', primaryKey: true },
+                            { name: 'dept_name', type: 'VARCHAR(100)' }
+                        ],
+                        data: [
+                            { dept_id: 'd001', dept_name: 'Human Resources' },
+                            { dept_id: 'd002', dept_name: 'Engineering' },
+                            { dept_id: 'd003', dept_name: 'Marketing' }
+                        ]
+                    }
+                }
+            },
+            project_db: {
+                tables: {
+                    projects: {
+                        columns: [
+                            { name: 'project_id', type: 'INT', primaryKey: true },
+                            { name: 'project_name', type: 'VARCHAR(100)' },
+                            { name: 'start_date', type: 'DATE' },
+                            { name: 'end_date', type: 'DATE' }
+                        ],
+                        data: [
+                            { project_id: 101, project_name: 'Alpha Launch', start_date: '2023-01-01', end_date: '2023-06-30' },
+                            { project_id: 102, project_name: 'Beta Test', start_date: '2023-07-01', end_date: '2023-12-31' }
+                        ]
+                    }
+                }
+            }
+        };
+        // Initialize information_schema.TABLES
+        function initializeInfoSchemaTables() {
+            databases.information_schema.tables.TABLES.data = [];
+            for (const dbName in databases) {
+                if (dbName === 'information_schema') continue;
+                for (const tableName in databases[dbName].tables) {
+                    databases.information_schema.tables.TABLES.data.push({
+                        TABLE_SCHEMA: dbName,
+                        TABLE_NAME: tableName,
+                        TABLE_TYPE: 'BASE TABLE'
+                    });
+                }
+            }
+        }
+        initializeInfoSchemaTables();
+
+
+        // --- Utility Functions ---
+        function appendOutput(text, type = '') {
+            const line = document.createElement('div');
+            line.className = 'output-line';
+            if (type === 'error') line.classList.add('error-message');
+            else if (type === 'success') line.classList.add('success-message');
+            else if (type === 'info') line.classList.add('info-message');
+            else if (type === 'welcome') line.classList.add('welcome-message');
+            
+            // Sanitize HTML to prevent XSS - very basic, for complex output use a library
+            const sanitizedText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+            if (text.startsWith('<table')) { // Allow table HTML if it's generated by us
+                line.innerHTML = text;
+            } else {
+                line.textContent = sanitizedText;
+            }
+            outputArea.appendChild(line);
+            outputArea.scrollTop = outputArea.scrollHeight; // Auto-scroll
+        }
+
+        function displayWelcomeMessage() {
+            appendOutput("Welcome to the Simulated MySQL Terminal!", "welcome");
+            appendOutput("Type 'HELP;' for a list of supported commands.", "welcome");
+            appendOutput("-----------------------------------------------", "welcome");
+        }
+
+        function formatTable(columns, data, tableName = "Result") {
+            if (!data || data.length === 0) {
+                return "Empty set";
+            }
+
+            let tableHtml = `<table class="table-like"><thead><tr>`;
+            columns.forEach(col => {
+                tableHtml += `<th>${col.name || col}</th>`; // col can be string or {name: '...'}
+            });
+            tableHtml += `</tr></thead><tbody>`;
+
+            data.forEach(row => {
+                tableHtml += `<tr>`;
+                columns.forEach(col => {
+                    const colName = col.name || col;
+                    tableHtml += `<td>${row[colName] !== undefined && row[colName] !== null ? row[colName] : 'NULL'}</td>`;
+                });
+                tableHtml += `</tr>`;
+            });
+            tableHtml += `</tbody></table>`;
+            const rowCount = data.length;
+            const timeTaken = (Math.random() * 0.1 + 0.001).toFixed(3); // Simulate query time
+            return `${tableHtml}${rowCount} row${rowCount > 1 ? 's' : ''} in set (${timeTaken} sec)`;
+        }
+        
+        function updatePrompt() {
+            promptText.textContent = currentDatabase ? `${currentDatabase}> ` : 'mysql> ';
+        }
+
+        // --- Command Processing ---
+        function processCommand(commandStr) {
+            appendOutput(`${promptText.textContent}${commandStr}`); // Echo command
+            commandStr = commandStr.trim();
+
+            if (!commandStr.endsWith(';')) {
+                 if (commandStr.toLowerCase() === 'clear' || commandStr.toLowerCase() === 'help' || commandStr.toLowerCase() === 'exit' || commandStr.toLowerCase() === 'quit') {
+                    // Allow these without semicolon
+                 } else {
+                    appendOutput("ERROR: Commands must end with a semicolon (;)", "error");
+                    return;
+                 }
+            } else {
+                commandStr = commandStr.slice(0, -1).trim(); // Remove semicolon for processing
+            }
+
+
+            const parts = commandStr.split(/\s+/);
+            const mainCommand = parts[0].toUpperCase();
+
+            try {
+                switch (mainCommand) {
+                    case 'HELP':
+                        handleHelp();
+                        break;
+                    case 'CLEAR':
+                        outputArea.innerHTML = '';
+                        break;
+                    case 'EXIT':
+                    case 'QUIT':
+                        appendOutput("Bye!", "info");
+                        commandInput.disabled = true;
+                        commandInput.placeholder = "Terminal closed. Refresh to restart.";
+                        break;
+                    case 'SHOW':
+                        handleShow(parts);
+                        break;
+                    case 'USE':
+                        handleUse(parts);
+                        break;
+                    case 'SELECT':
+                        handleSelect(commandStr); // Pass full command for parsing
+                        break;
+                    case 'DESC':
+                    case 'DESCRIBE':
+                    case 'EXPLAIN':
+                        handleDescribe(parts);
+                        break;
+                    case 'CREATE':
+                        handleCreate(commandStr);
+                        break;
+                    case 'INSERT':
+                        handleInsert(commandStr);
+                        break;
+                    case 'UPDATE':
+                        handleUpdate(commandStr);
+                        break;
+                    case 'DELETE':
+                        handleDelete(commandStr);
+                        break;
+                    default:
+                        if (commandStr === '') { // Empty command after semicolon
+                            // Do nothing, just new prompt
+                        } else {
+                            appendOutput(`ERROR: Unknown command: '${parts[0]}'. Type 'HELP;' for available commands.`, "error");
+                        }
+                }
+            } catch (e) {
+                appendOutput(`ERROR: ${e.message}`, "error");
+                console.error(e);
+            }
+        }
+
+        // --- Command Handlers ---
+        function handleHelp() {
+            const helpText = `
+Supported Commands:
+  HELP;                                  Show this help message.
+  CLEAR;                                 Clear the terminal screen.
+  EXIT; / QUIT;                          Close the terminal.
+
+  SHOW DATABASES;                       List all available databases.
+  USE <database_name>;                  Select a database to use.
+  SHOW TABLES;                          List tables in the current database.
+
+  SELECT * FROM <table_name>;           Retrieve all data from a table.
+  SELECT <col1>, <col2> FROM <table_name>; Retrieve specific columns.
+  DESCRIBE <table_name>;                Show the structure of a table.
+  EXPLAIN <table_name>;                 Alias for DESCRIBE.
+
+  CREATE DATABASE <database_name>;      Create a new database (simulated).
+  CREATE TABLE <table_name> (           Create a new table (simulated, basic).
+      column1_name type, 
+      column2_name type, ...
+  );
+  INSERT INTO <table_name> (col1, col2) VALUES (val1, val2); (simulated)
+  INSERT INTO <table_name> VALUES (val1, val2, ...); (simulated)
+
+  UPDATE <table_name> SET col1 = val1 WHERE <condition>; (simulated, condition ignored)
+  DELETE FROM <table_name> WHERE <condition>; (simulated, condition ignored, deletes all)
+
+Note: This is a simulation. Data is not persisted. Complex queries, WHERE clauses (except for basic simulation), JOINs, etc., are not fully supported.
+`;
+            appendOutput(helpText.trim(), "info");
+        }
+
+        function handleShow(parts) {
+            if (parts.length < 2) {
+                appendOutput("ERROR: Incomplete SHOW command. Try 'SHOW DATABASES;' or 'SHOW TABLES;'", "error");
+                return;
+            }
+            const subCommand = parts[1].toUpperCase();
+            if (subCommand === 'DATABASES') {
+                const dbList = Object.keys(databases).map(dbName => ({ Database: dbName }));
+                appendOutput(formatTable([{name: 'Database'}], dbList));
+            } else if (subCommand === 'TABLES') {
+                if (!currentDatabase) {
+                    appendOutput("ERROR: No database selected. Use 'USE <database_name>;'", "error");
+                    return;
+                }
+                if (databases[currentDatabase]) {
+                    const tableList = Object.keys(databases[currentDatabase].tables).map(tableName => ({ [`Tables_in_${currentDatabase}`]: tableName }));
+                    appendOutput(formatTable([{name: `Tables_in_${currentDatabase}`}], tableList));
+                } else {
+                    appendOutput(`ERROR: Database '${currentDatabase}' not found.`, "error");
+                }
+            } else {
+                appendOutput(`ERROR: Unknown SHOW command variant: 'SHOW ${parts[1]}'. Try 'SHOW DATABASES;' or 'SHOW TABLES;'`, "error");
+            }
+        }
+
+        function handleUse(parts) {
+            if (parts.length < 2) {
+                appendOutput("ERROR: Incomplete USE command. Syntax: USE <database_name>;", "error");
+                return;
+            }
+            const dbName = parts[1].toLowerCase();
+            if (databases[dbName]) {
+                currentDatabase = dbName;
+                updatePrompt();
+                appendOutput(`Database changed to '${dbName}'`, "success");
+            } else {
+                appendOutput(`ERROR: Unknown database '${parts[1]}'`, "error");
+            }
+        }
+
+        function handleSelect(commandStr) {
+            if (!currentDatabase) {
+                appendOutput("ERROR: No database selected. Use 'USE <database_name>;'", "error");
+                return;
+            }
+            // Basic parser: SELECT <cols> FROM <tableName> (optional WHERE, but ignored for now)
+            const match = commandStr.match(/^SELECT\s+(.+)\s+FROM\s+([a-zA-Z0-9_]+)(?:\s+WHERE\s+.+)?/i);
+            if (!match) {
+                appendOutput("ERROR: Invalid SELECT syntax. Expected: SELECT <columns> FROM <table_name>;", "error");
+                return;
+            }
+
+            const columnsStr = match[1].trim();
+            const tableName = match[2].toLowerCase();
+
+            if (!databases[currentDatabase].tables[tableName]) {
+                appendOutput(`ERROR: Table '${currentDatabase}.${tableName}' doesn't exist.`, "error");
+                return;
+            }
+
+            const table = databases[currentDatabase].tables[tableName];
+            let selectedColumns;
+            let dataToDisplay;
+
+            if (columnsStr === '*') {
+                selectedColumns = table.columns.map(col => col.name);
+                dataToDisplay = table.data;
+            } else {
+                selectedColumns = columnsStr.split(',').map(s => s.trim());
+                // Validate selected columns
+                const tableColNames = table.columns.map(c => c.name);
+                for (const selCol of selectedColumns) {
+                    if (!tableColNames.includes(selCol)) {
+                        appendOutput(`ERROR: Unknown column '${selCol}' in 'field list'`, "error");
+                        return;
+                    }
+                }
+                dataToDisplay = table.data.map(row => {
+                    const newRow = {};
+                    selectedColumns.forEach(colName => {
+                        newRow[colName] = row[colName];
+                    });
+                    return newRow;
+                });
+            }
+            appendOutput(formatTable(selectedColumns, dataToDisplay));
+        }
+
+        function handleDescribe(parts) {
+            if (parts.length < 2) {
+                appendOutput("ERROR: Incomplete DESCRIBE command. Syntax: DESCRIBE <table_name>;", "error");
+                return;
+            }
+            if (!currentDatabase) {
+                appendOutput("ERROR: No database selected. Use 'USE <database_name>;'", "error");
+                return;
+            }
+            const tableName = parts[1].toLowerCase();
+            if (databases[currentDatabase] && databases[currentDatabase].tables[tableName]) {
+                const tableColumns = databases[currentDatabase].tables[tableName].columns;
+                const description = tableColumns.map(col => ({
+                    Field: col.name,
+                    Type: col.type,
+                    Null: col.allowNull === false ? 'NO' : 'YES', // Simplified
+                    Key: col.primaryKey ? 'PRI' : (col.unique ? 'UNI' : ''),
+                    Default: col.default !== undefined ? col.default : 'NULL',
+                    Extra: col.autoIncrement ? 'auto_increment' : ''
+                }));
+                const displayCols = [{name: 'Field'}, {name: 'Type'}, {name: 'Null'}, {name: 'Key'}, {name: 'Default'}, {name: 'Extra'}];
+                appendOutput(formatTable(displayCols, description));
+            } else {
+                appendOutput(`ERROR: Table '${currentDatabase}.${tableName}' doesn't exist.`, "error");
+            }
+        }
+        
+        function handleCreate(commandStr) {
+            const dbMatch = commandStr.match(/^CREATE\s+DATABASE\s+([a-zA-Z0-9_]+)/i);
+            if (dbMatch) {
+                const dbName = dbMatch[1].toLowerCase();
+                if (databases[dbName]) {
+                    appendOutput(`ERROR: Can't create database '${dbName}'; database exists`, "error");
+                } else {
+                    databases[dbName] = { tables: {} };
+                    // Add to information_schema.SCHEMATA
+                    databases.information_schema.tables.SCHEMATA.data.push(
+                         { SCHEMA_NAME: dbName, DEFAULT_CHARACTER_SET_NAME: 'utf8mb4', DEFAULT_COLLATION_NAME: 'utf8mb4_0900_ai_ci' }
+                    );
+                    initializeInfoSchemaTables(); // Re-populate TABLE_INFO
+                    appendOutput(`Query OK, 1 row affected`, "success");
+                }
+                return;
+            }
+
+            const tableMatch = commandStr.match(/^CREATE\s+TABLE\s+([a-zA-Z0-9_]+)\s*\((.+)\)/i);
+            if (tableMatch) {
+                if (!currentDatabase) {
+                    appendOutput("ERROR: No database selected. Use 'USE <database_name>;'", "error");
+                    return;
+                }
+                const tableName = tableMatch[1].toLowerCase();
+                const columnDefs = tableMatch[2].trim();
+
+                if (databases[currentDatabase].tables[tableName]) {
+                    appendOutput(`ERROR: Table '${tableName}' already exists`, "error");
+                    return;
+                }
+                
+                try {
+                    const columns = columnDefs.split(',').map(def => {
+                        const parts = def.trim().split(/\s+/);
+                        if (parts.length < 2) throw new Error(`Invalid column definition: ${def}`);
+                        // Very basic parsing, doesn't handle constraints like PRIMARY KEY, NOT NULL here
+                        return { name: parts[0], type: parts.slice(1).join(' ').toUpperCase() };
+                    });
+
+                    databases[currentDatabase].tables[tableName] = {
+                        columns: columns,
+                        data: []
+                    };
+                    initializeInfoSchemaTables(); // Re-populate TABLE_INFO
+                    appendOutput(`Query OK, 0 rows affected`, "success");
+                } catch (e) {
+                    appendOutput(`ERROR parsing CREATE TABLE: ${e.message}. Example: CREATE TABLE my_table (id INT, name VARCHAR(255));`, "error");
+                }
+                return;
+            }
+            appendOutput("ERROR: Invalid CREATE syntax. Try CREATE DATABASE <name>; or CREATE TABLE <name> (...);", "error");
+        }
+
+        function handleInsert(commandStr) {
+            if (!currentDatabase) {
+                appendOutput("ERROR: No database selected. Use 'USE <database_name>;'", "error");
+                return;
+            }
+            // INSERT INTO table_name (column1, column2, ...) VALUES (value1, value2, ...);
+            // INSERT INTO table_name VALUES (value1, value2, ...);
+            const match = commandStr.match(/^INSERT\s+INTO\s+([a-zA-Z0-9_]+)\s*(?:\(([^)]+)\))?\s*VALUES\s*\(([^)]+)\)/i);
+
+            if (!match) {
+                appendOutput("ERROR: Invalid INSERT syntax.", "error");
+                return;
+            }
+
+            const tableName = match[1].toLowerCase();
+            const columnListStr = match[2]; // Optional
+            const valueListStr = match[3];
+
+            if (!databases[currentDatabase].tables[tableName]) {
+                appendOutput(`ERROR: Table '${currentDatabase}.${tableName}' doesn't exist.`, "error");
+                return;
+            }
+
+            const table = databases[currentDatabase].tables[tableName];
+            const values = valueListStr.split(',').map(v => {
+                let val = v.trim();
+                // Rudimentary type conversion/cleaning
+                if ((val.startsWith("'") && val.endsWith("'")) || (val.startsWith('"') && val.endsWith('"'))) {
+                    return val.slice(1, -1); // String
+                }
+                if (val.toLowerCase() === 'null') return null;
+                if (!isNaN(parseFloat(val)) && isFinite(val)) return parseFloat(val); // Number
+                return val; // Treat as string if unsure
+            });
+
+            let newRow = {};
+            if (columnListStr) { // Columns specified
+                const columns = columnListStr.split(',').map(c => c.trim());
+                if (columns.length !== values.length) {
+                    appendOutput(`ERROR: Column count doesn't match value count.`, "error");
+                    return;
+                }
+                columns.forEach((colName, index) => {
+                    if (!table.columns.find(c => c.name === colName)) {
+                         throw new Error(`Unknown column '${colName}' in '${tableName}'`);
+                    }
+                    newRow[colName] = values[index];
+                });
+                // Fill unspecified columns with null or default (simplified: null)
+                table.columns.forEach(tableCol => {
+                    if (!newRow.hasOwnProperty(tableCol.name)) {
+                        newRow[tableCol.name] = null;
+                    }
+                });
+
+            } else { // Columns not specified, use table order
+                if (values.length !== table.columns.length) {
+                    appendOutput(`ERROR: Column count doesn't match value count. Table '${tableName}' has ${table.columns.length} columns.`, "error");
+                    return;
+                }
+                table.columns.forEach((col, index) => {
+                    newRow[col.name] = values[index];
+                });
+            }
+            
+            table.data.push(newRow);
+            appendOutput(`Query OK, 1 row affected.`, "success");
+        }
+
+        function handleUpdate(commandStr) {
+            // Very simplified: UPDATE table_name SET column1 = value1, ... WHERE condition (condition ignored)
+            if (!currentDatabase) {
+                appendOutput("ERROR: No database selected.", "error"); return;
+            }
+            const match = commandStr.match(/^UPDATE\s+([a-zA-Z0-9_]+)\s+SET\s+(.+?)(?:\s+WHERE\s+(.+))?$/i);
+            if (!match) {
+                appendOutput("ERROR: Invalid UPDATE syntax.", "error"); return;
+            }
+            const tableName = match[1].toLowerCase();
+            const setClauses = match[2];
+            // const whereClause = match[3]; // Ignored for this simulation
+
+            if (!databases[currentDatabase].tables[tableName]) {
+                appendOutput(`ERROR: Table '${tableName}' doesn't exist.`, "error"); return;
+            }
+            const table = databases[currentDatabase].tables[tableName];
+            if (table.data.length === 0) {
+                 appendOutput(`Query OK, 0 rows affected. (Table was empty)`, "success"); return;
+            }
+
+            const updates = {};
+            setClauses.split(',').forEach(clause => {
+                const [col, valStr] = clause.split('=').map(s => s.trim());
+                let val = valStr;
+                if ((val.startsWith("'") && val.endsWith("'")) || (val.startsWith('"') && val.endsWith('"'))) {
+                    val = val.slice(1, -1);
+                } else if (!isNaN(parseFloat(val)) && isFinite(val)) {
+                    val = parseFloat(val);
+                }
+                updates[col] = val;
+            });
+            
+            // Apply to all rows (since WHERE is ignored)
+            table.data.forEach(row => {
+                for (const colName in updates) {
+                    if (row.hasOwnProperty(colName)) {
+                        row[colName] = updates[colName];
+                    }
+                }
+            });
+            appendOutput(`Query OK, ${table.data.length} row(s) affected. (Simulated: WHERE clause ignored, all rows updated)`, "success");
+        }
+
+        function handleDelete(commandStr) {
+            // Simplified: DELETE FROM table_name WHERE condition (condition ignored, deletes all)
+             if (!currentDatabase) {
+                appendOutput("ERROR: No database selected.", "error"); return;
+            }
+            const match = commandStr.match(/^DELETE\s+FROM\s+([a-zA-Z0-9_]+)(?:\s+WHERE\s+(.+))?$/i);
+            if (!match) {
+                appendOutput("ERROR: Invalid DELETE syntax.", "error"); return;
+            }
+            const tableName = match[1].toLowerCase();
+            // const whereClause = match[2]; // Ignored
+
+            if (!databases[currentDatabase].tables[tableName]) {
+                appendOutput(`ERROR: Table '${tableName}' doesn't exist.`, "error"); return;
+            }
+            const table = databases[currentDatabase].tables[tableName];
+            const numRowsDeleted = table.data.length;
+            table.data = []; // Delete all data
+            appendOutput(`Query OK, ${numRowsDeleted} row(s) affected. (Simulated: WHERE clause ignored, all rows deleted)`, "success");
+        }
+
+
+        // --- Event Listeners ---
+        commandInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const command = commandInput.value;
+                if (command.trim() !== '') {
+                    commandHistory.unshift(command); // Add to beginning for easier access
+                    if (commandHistory.length > 50) commandHistory.pop(); // Limit history size
+                }
+                historyIndex = -1; // Reset history index
+                processCommand(command);
+                commandInput.value = ''; // Clear input
+            } else if (event.key === 'ArrowUp') {
+                event.preventDefault();
+                if (commandHistory.length > 0 && historyIndex < commandHistory.length - 1) {
+                    historyIndex++;
+                    commandInput.value = commandHistory[historyIndex];
+                    commandInput.setSelectionRange(commandInput.value.length, commandInput.value.length); // Move cursor to end
+                }
+            } else if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                if (historyIndex > 0) {
+                    historyIndex--;
+                    commandInput.value = commandHistory[historyIndex];
+                    commandInput.setSelectionRange(commandInput.value.length, commandInput.value.length);
+                } else if (historyIndex === 0) { // Reached oldest, clear input
+                    historyIndex = -1;
+                    commandInput.value = '';
+                }
+            }
+        });
+
+        // Keep focus on input
+        document.body.addEventListener('click', (event) => {
+            if (event.target !== commandInput) {
+                commandInput.focus();
+            }
+        });
+        
+        // --- Initialization ---
+        displayWelcomeMessage();
+        updatePrompt(); // Set initial prompt
+        commandInput.focus(); // Ensure focus on load
+
+    </script>
+</body>
+</html>
+
