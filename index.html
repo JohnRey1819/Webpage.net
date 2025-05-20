@@ -358,32 +358,24 @@
         // --- Command Handlers ---
         function handleHelp() {
             const helpText = `
-Supported Commands:
-  HELP;                                  Show this help message.
-  CLEAR;                                 Clear the terminal screen.
-  EXIT; / QUIT;                          Close the terminal.
-
-  SHOW DATABASES;                       List all available databases.
-  USE <database_name>;                  Select a database to use.
-  SHOW TABLES;                          List tables in the current database.
-
-  SELECT * FROM <table_name>;           Retrieve all data from a table.
-  SELECT <col1>, <col2> FROM <table_name>; Retrieve specific columns.
-  DESCRIBE <table_name>;                Show the structure of a table.
-  EXPLAIN <table_name>;                 Alias for DESCRIBE.
-
-  CREATE DATABASE <database_name>;      Create a new database (simulated).
-  CREATE TABLE <table_name> (           Create a new table (simulated, basic).
-      column1_name type, 
-      column2_name type, ...
-  );
-  INSERT INTO <table_name> (col1, col2) VALUES (val1, val2); (simulated)
-  INSERT INTO <table_name> VALUES (val1, val2, ...); (simulated)
-
-  UPDATE <table_name> SET col1 = val1 WHERE <condition>; (simulated, condition ignored)
-  DELETE FROM <table_name> WHERE <condition>; (simulated, condition ignored, deletes all)
-
-Note: This is a simulation. Data is not persisted. Complex queries, WHERE clauses (except for basic simulation), JOINs, etc., are not fully supported.
+CREATE DATABASE database_name;
+    DROP DATABASE database_name;
+    USE database_name;
+    SHOW DATABASES;
+    SHOW TABLES;
+    CREATE TABLE name (col1 TYPE, col2 TYPE, ...);
+    DROP TABLE table_name;
+    DESCRIBE table_name; / DESC table_name;
+    INSERT INTO table (cols) VALUES (vals);
+    SELECT * FROM table [WHERE col = val];
+    DELETE FROM table [WHERE col = val];
+    UPDATE table SET col=val [WHERE col = val];
+    ALTER TABLE name ADD [COLUMN] col_name TYPE;
+    ALTER TABLE name DROP [COLUMN] col_name;
+    TRUNCATE TABLE table_name;
+    CLS; / CLEAR;
+    HELP;
+    EXIT; / QUIT; 
 `;
             appendOutput(helpText.trim(), "info");
         }
